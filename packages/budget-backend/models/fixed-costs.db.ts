@@ -1,0 +1,11 @@
+import { model, Schema } from "mongoose";
+
+export const FixedCosts = new Schema({
+  email: { type: String, required: true },
+  category: { type: Schema.Types.ObjectId, ref: "Category" },
+  name: { type: String },
+  amount: { type: Number },
+  type: { type: String, allowedValues: ["income", "expense"] },
+});
+
+export const FixedCostsModel = model("FixedCosts", FixedCosts);

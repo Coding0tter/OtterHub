@@ -1,0 +1,26 @@
+{
+  "name": "gateway-frontend",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.9",
+    "vite-plugin-solid": "^2.11.1"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.9",
+    "axios": "^1.8.1",
+    "shared": "workspace:*",
+    "components": "workspace:*",
+    "solid-js": "^1.9.3",
+    "tailwindcss": "^4.0.8"
+  }
+}
