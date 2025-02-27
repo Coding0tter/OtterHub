@@ -1,0 +1,15 @@
+{
+  "name": "frontend-proxy",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun index.ts",
+    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile ../../output/frontend-proxy index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

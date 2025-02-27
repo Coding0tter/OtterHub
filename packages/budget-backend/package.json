@@ -1,0 +1,19 @@
+{
+  "name": "budget-backend",
+  "module": "server.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile ../../output/budget-backend server.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "elysia": "^1.2.24",
+    "mongoose": "^8.12.1",
+    "shared": "workspace:*"
+  }
+}

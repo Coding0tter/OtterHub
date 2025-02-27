@@ -1,0 +1,14 @@
+{
+  "name": "shared",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "^1.2.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "mongoose": "^8.11.0"
+  }
+}

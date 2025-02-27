@@ -1,0 +1,25 @@
+{
+  "name": "auth",
+  "module": "auth.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --external:aws-sdk --external:mock-aws-s3 --external:nock --outfile ../../output/auth-backend auth.ts"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^1.2.0",
+    "aws-sdk": "^2.1692.0",
+    "bcrypt": "^5.1.1",
+    "elysia": "^1.2.22",
+    "google-auth-library": "^9.15.1",
+    "jsonwebtoken": "^9.0.2",
+    "mock-aws-s3": "^4.0.2",
+    "nock": "^14.0.1"
+  }
+}
