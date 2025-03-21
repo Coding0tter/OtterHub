@@ -5,7 +5,7 @@ import { resolve } from "path";
 
 export default defineConfig({
   plugins: [solidPlugin(), tailwindcss()],
-  base: "/fitness",
+  base: "/fitness/",
   server: {
     port: 5174,
   },
@@ -13,6 +13,8 @@ export default defineConfig({
   envPrefix: "OTTER",
   build: {
     target: "esnext",
+    outDir: "../../output/dist/fitness-tracker",
+    emptyOutDir: true,
   },
   resolve: {
     alias: {

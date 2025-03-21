@@ -10,7 +10,8 @@
     "frontend-proxy": "cd packages/frontend-proxy && bun start",
     "budget": "bun run --watch packages/budget-backend/server.ts",
     "budget-frontend": "cd packages/budget-frontend && bun run dev",
-    "start": "bunx concurrently -n 'GW, GW-FE, AUTH, FT, FT-FE, BG, BG-FE, PROXY' -c 'blue.bold,cyan.bold,magenta.bold,green.bold,yellow.bold' \"bun run gateway\" \"bun run gateway-frontend\" \"bun run auth\" \"bun run fitness-tracker\" \"bun run fitness-tracker-frontend\" \"bun run budget\" \"bun run budget-frontend\" \"bun run frontend-proxy\""
+    "start": "bunx concurrently -n 'GW, GW-FE, AUTH, FT, FT-FE, BG, BG-FE, PROXY' -c 'blue.bold,cyan.bold,magenta.bold,green.bold,yellow.bold' \"bun run gateway\" \"bun run gateway-frontend\" \"bun run auth\" \"bun run fitness-tracker\" \"bun run fitness-tracker-frontend\" \"bun run budget\" \"bun run budget-frontend\" \"bun run frontend-proxy\"",
+    "build": "cd scripts && ./build.sh"
   },
   "workspaces": [
     "packages/*"

@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "elysia": "^1.2.25",
+    "@elysiajs/cors": "^1.2.0",
     "jsonwebtoken": "^9.0.2"
   }
 }
-

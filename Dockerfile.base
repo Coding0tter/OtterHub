@@ -1,0 +1,10 @@
+FROM oven/bun:latest
+
+WORKDIR /app
+
+# Copy only the shared dependency files (you might include shared package.json, bun.lockb, etc.)
+COPY . .
+
+# Install dependencies once
+RUN bun install
+

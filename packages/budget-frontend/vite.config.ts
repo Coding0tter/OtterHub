@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [solidPlugin(), tailwindcss()],
-  base: "/budget",
+  base: "/budget/",
   server: {
     port: 5175,
   },
@@ -13,6 +13,8 @@ export default defineConfig({
   envPrefix: "OTTER",
   build: {
     target: "esnext",
+    outDir: "../../output/dist/budget",
+    emptyOutDir: true,
   },
   resolve: {
     alias: {

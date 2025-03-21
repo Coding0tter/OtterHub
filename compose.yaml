@@ -1,0 +1,95 @@
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: packages/auth/Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - "${AUTH_PORT}:${AUTH_PORT}"
+    env_file:
+      - .env
+
+  budget-backend:
+    build:
+      context: .
+      dockerfile: packages/budget-backend/Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - "${BUDGET_PORT}:${BUDGET_PORT}"
+    env_file:
+      - .env
+
+  budget-frontend:
+    build:
+      context: .
+      dockerfile: packages/budget-frontend/Dockerfile
+    ports:
+      - "${BUDGET_FRONTEND_PORT}:${BUDGET_FRONTEND_PORT}"
+    env_file:
+      - .env
+
+  fitness-tracker-backend:
+    build:
+      context: .
+      dockerfile: packages/fitness-tracker-backend/Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - "${FITNESS_PORT}:${FITNESS_PORT}"
+    env_file:
+      - .env
+
+  fitness-tracker-frontend:
+    build:
+      context: .
+      dockerfile: packages/fitness-tracker-frontend/Dockerfile
+    ports:
+      - "${FITNESS_FRONTEND_PORT}:${FITNESS_FRONTEND_PORT}"
+    env_file:
+      - .env
+
+  frontend-proxy:
+    build:
+      context: .
+      dockerfile: packages/frontend-proxy/Dockerfile
+    ports:
+      - "${PROXY_PORT}:${PROXY_PORT}"
+    env_file:
+      - .env
+
+  gateway-backend:
+    build:
+      context: .
+      dockerfile: packages/gateway-backend/Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    env_file:
+      - .env
+
+  gateway-frontend:
+    build:
+      context: .
+      dockerfile: packages/gateway-frontend/Dockerfile
+    ports:
+      - "${GATEWAY_FRONTEND_PORT}:${GATEWAY_FRONTEND_PORT}"
+    env_file:
+      - .env
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

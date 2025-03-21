@@ -13,6 +13,8 @@ export default defineConfig({
   },
   build: {
     target: "esnext",
+    outDir: "../../output/dist/gateway",
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
