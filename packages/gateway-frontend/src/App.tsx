@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Button, Card, Header, Input, Navbar, useToast } from "components";
-import { getApiClient, getUser, logout, type User } from "shared";
+import { getApiClient, getUser, isMobile, logout, type User } from "shared";
 import { createResource, createSignal, onMount } from "solid-js";
 
 declare const google: any;
@@ -47,6 +47,8 @@ const App = () => {
 
     google.accounts.id.initialize({
       client_id: import.meta.env.OTTER_GOOGLE_CLIENT_ID,
+      login_uri: import.meta.env.OTTER_FRONTEND_URL,
+      ux_mode: isMobile() ? "redirect" : "popup",
       callback: async (response: { credential: string }) => {
         const authResponse = await axios.post(
           `${import.meta.env.OTTER_API_URL}/auth/google`,
