@@ -1,34 +1,16 @@
 import Elysia from "elysia";
-import { connectToDb, parseUserHeader, type User } from "shared";
+import { auth, connectToDb, type User } from "shared";
 import {
   deleteAccount,
   getAccounts,
   upsertAccount,
 } from "./services/account.service";
-import type { Account } from "./types/account";
-import type { FinanceUser } from "./types/finance-user";
 import {
   getSavingsGoal,
   getUser,
   updateSavingsGoal,
   upsertUser,
 } from "./services/budget.service";
-import {
-  deleteFixedCost,
-  getFixedCategoryBreakdown,
-  getFixedCosts,
-  upsertFixedCost,
-} from "./services/fixed-costs.service";
-import type { FixedCost } from "./types/fixed-cost";
-import {
-  addTransaction,
-  deleteTransaction,
-  getCategoryBreakdown,
-  getMonthlyTransactions,
-  getTransactions,
-  updateTransaction,
-} from "./services/transactions.service";
-import type { Transaction } from "./types/transaction";
 import {
   deleteCategory,
   deleteSubCategory,
@@ -37,32 +19,86 @@ import {
   upsertCategory,
   upsertSubCategory,
 } from "./services/category.service";
+import {
+  deleteFixedCost,
+  getFixedCategoryBreakdown,
+  getFixedCosts,
+  upsertFixedCost,
+} from "./services/fixed-costs.service";
+import {
+  addTransaction,
+  deleteTransaction,
+  getCategoryBreakdown,
+  getMonthlyTransactions,
+  getTransactions,
+  updateTransaction,
+} from "./services/transactions.service";
+import type { Account } from "./types/account";
 import type { Category, SubCategory } from "./types/category";
+import type { FinanceUser } from "./types/finance-user";
+import type { FixedCost } from "./types/fixed-cost";
+import type { Transaction } from "./types/transaction";
+import cors from "@elysiajs/cors";
+import { seedCategories } from "./services/seed-category.service";
 
 const PORT = Bun.env.BUDGET_PORT as string;
 await connectToDb("budget");
 
+const betterAuth = new Elysia({ name: "better-auth" })
+  .use(
+    cors({
+      origin: Bun.env.OTTER_FRONTEND_URL,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  )
+  .macro({
+    auth: {
+      async resolve({ error, request: { headers } }) {
+        const session = await auth.api.getSession({
+          headers,
+        });
+
+        if (!session) return error(401);
+
+        return {
+          user: session.user,
+          session: session.session,
+        };
+      },
+    },
+  });
+
 new Elysia()
   .onError(({ code, error }) => console.error(code, error))
-  .onBeforeHandle(parseUserHeader)
-  .get("/user", async ({ user }: { user: FinanceUser }) => {
-    const existingUser = await getUser(user.email!);
-    if (!existingUser) {
-      return await upsertUser(user);
-    }
-    return existingUser;
-  })
+  .use(betterAuth)
+  .get(
+    "/user",
+    async ({ user }: { user: FinanceUser }) => {
+      const existingUser = await getUser(user.id!);
+      if (!existingUser) {
+        await seedCategories(user.id!);
+        return await upsertUser(user);
+      }
+      return existingUser;
+    },
+    { auth: true },
+  )
   .get(
     "/savings-goal",
-    async ({ user }: { user: FinanceUser }) => await getSavingsGoal(user.email),
+    async ({ user }: { user: FinanceUser }) => await getSavingsGoal(user.id),
+    { auth: true },
   )
   .get(
     "/account",
-    async ({ user }: { user: User }) => await getAccounts(user.email),
+    async ({ user }: { user: User }) => await getAccounts(user.id),
+    { auth: true },
   )
   .get(
     "/fixed-costs",
-    async ({ user }: { user: User }) => await getFixedCosts(user.email),
+    async ({ user }: { user: User }) => await getFixedCosts(user.id),
+    { auth: true },
   )
   .post(
     "/fixed-costs",
@@ -72,7 +108,8 @@ new Elysia()
     }: {
       user: User;
       body: { fixedCost: Partial<FixedCost> };
-    }) => await upsertFixedCost(user.email, body.fixedCost),
+    }) => await upsertFixedCost(user.id, body.fixedCost),
+    { auth: true },
   )
   .delete(
     "/fixed-costs/:id",
@@ -87,7 +124,8 @@ new Elysia()
     }: {
       user: User;
       params: { type: "income" | "expense" };
-    }) => await getFixedCategoryBreakdown(user.email, params.type),
+    }) => await getFixedCategoryBreakdown(user.id, params.type),
+    { auth: true },
   )
 
   .post(
@@ -98,7 +136,8 @@ new Elysia()
     }: {
       user: FinanceUser;
       body: { savingsGoal: number };
-    }) => await updateSavingsGoal(user.email, body.savingsGoal),
+    }) => await updateSavingsGoal(user.id, body.savingsGoal),
+    { auth: true },
   )
   .post(
     "/account",
@@ -108,22 +147,27 @@ new Elysia()
     }: {
       user: User;
       body: { account: Partial<Account> };
-    }) => await upsertAccount(user.email, body.account),
+    }) => await upsertAccount(user.id, body.account),
+    { auth: true },
   )
   .delete(
     "/account",
     async ({ query }: { query: { accountId: string } }) =>
       await deleteAccount(query.accountId),
   )
-  .get("/transaction", async ({ user, query }: { user: User; query: any }) => {
-    const { start, end, type, category } = query;
-    return await getTransactions(user.email, {
-      startDate: start ? new Date(start) : undefined,
-      endDate: end ? new Date(end) : undefined,
-      type,
-      category,
-    });
-  })
+  .get(
+    "/transaction",
+    async ({ user, query }: { user: User; query: any }) => {
+      const { start, end, type, category } = query;
+      return await getTransactions(user.id, {
+        startDate: start ? new Date(start) : undefined,
+        endDate: end ? new Date(end) : undefined,
+        type,
+        category,
+      });
+    },
+    { auth: true },
+  )
   .get(
     "/transaction/monthly/:year/:month",
     async ({
@@ -134,10 +178,11 @@ new Elysia()
       params: { year: string; month: string };
     }) =>
       await getMonthlyTransactions(
-        user.email,
+        user.id,
         parseInt(params.year),
         parseInt(params.month),
       ),
+    { auth: true },
   )
   .get(
     "/transaction/categories",
@@ -153,11 +198,12 @@ new Elysia()
       };
     }) =>
       await getCategoryBreakdown(
-        user.email,
+        user.id,
         parseInt(query.year),
         query.month ? parseInt(query.month) : undefined,
         query.type || "expense",
       ),
+    { auth: true },
   )
   .post(
     "/transaction",
@@ -167,7 +213,8 @@ new Elysia()
     }: {
       user: User;
       body: { transaction: Partial<Transaction> };
-    }) => await addTransaction(user.email, body.transaction),
+    }) => await addTransaction(user.id, body.transaction),
+    { auth: true },
   )
   .put(
     "/transaction/:id",
@@ -178,20 +225,26 @@ new Elysia()
       params: { id: string };
       body: { transaction: Partial<Transaction> };
     }) => await updateTransaction(params.id, body.transaction),
+    { auth: true },
   )
   .delete(
     "/transaction/:id",
     async ({ params }: { params: { id: string } }) =>
       await deleteTransaction(params.id),
+
+    { auth: true },
   )
   .get(
     "/categories",
-    async ({ user }: { user: User }) => await getCategories(user.email),
+    async ({ user }: { user: User }) => await getCategories(user.id),
+
+    { auth: true },
   )
   .get(
     "/categories/with-subcategories",
     async ({ user }: { user: User }) =>
-      await getCategoriesWithSubcategories(user.email),
+      await getCategoriesWithSubcategories(user.id),
+    { auth: true },
   )
   .post(
     "/categories",
@@ -201,7 +254,8 @@ new Elysia()
     }: {
       user: User;
       body: { category: Partial<Category> };
-    }) => await upsertCategory(user.email, body.category),
+    }) => await upsertCategory(user.id, body.category),
+    { auth: true },
   )
   .post(
     "/subCategories",
@@ -211,7 +265,8 @@ new Elysia()
     }: {
       user: User;
       body: { subCategory: Partial<SubCategory> };
-    }) => await upsertSubCategory(user.email, body.subCategory),
+    }) => await upsertSubCategory(user.id, body.subCategory),
+    { auth: true },
   )
   .delete(
     "/categories/:id",
@@ -223,4 +278,4 @@ new Elysia()
     async ({ params }: { params: { id: string } }) =>
       await deleteSubCategory(params.id),
   )
-  .listen(PORT, () => console.log(`Fitness Tracker running on port ${PORT}`));
+  .listen(PORT, () => console.log(`Budget running on port ${PORT}`));

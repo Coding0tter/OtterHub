@@ -3,7 +3,7 @@ import type { Workout } from "fitness-tracker-backend/types/workout";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button, Card, Header, Label, Input, useToast } from "components";
 import type { Exercise } from "fitness-tracker-backend/types/exercise";
-import { fitnessApiClient } from "../App";
+import { fitnessApi } from "../App";
 
 export const ActiveWorkout = () => {
   const { addToast } = useToast();
@@ -18,7 +18,7 @@ export const ActiveWorkout = () => {
   }>();
 
   const [workout, { mutate }] = createResource<Workout>(async () => {
-    const response = await fitnessApiClient.get(`/workout?id=${params.id}`);
+    const response = await fitnessApi.get(`/workout?id=${params.id}`);
     const workoutData = response.data;
 
     return workoutData;
@@ -93,7 +93,7 @@ export const ActiveWorkout = () => {
         sets: finishedSets()![exercise],
       }));
 
-      await fitnessApiClient.post("/workout/finish", { exercises: payload });
+      await fitnessApi.post("/workout/finish", { exercises: payload });
       navigation("/fitness");
       addToast({ message: "Workout saved. Well done" });
     } catch (err) {

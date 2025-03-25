@@ -11,10 +11,10 @@ export const OverallProgressChart = (props: any) => {
   onMount(() => {
     const ctx = canvas!.getContext("2d");
 
-    const labels = props.data.map((item: any) =>
+    const labels = props.data?.map((item: any) =>
       new Date(item._id).toLocaleDateString(),
     );
-    const avgWeights = props.data.map((item: any) => item.avgWeight);
+    const avgWeights = props.data?.map((item: any) => item.avgWeight);
 
     chartInstance = new Chart(ctx, {
       type: "line",

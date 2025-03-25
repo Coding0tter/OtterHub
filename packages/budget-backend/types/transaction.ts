@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 
 export interface Transaction extends Document {
-  email: string;
+  userId: string;
   category?: string;
   subCategory?: string;
   account?: string;

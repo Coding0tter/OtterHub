@@ -1,8 +1,9 @@
 import type { ProfilePicture } from "./profilePicture";
 
 export type User = {
+  id: string;
   email: string;
   name: string;
-  picture: ProfilePicture;
-  services: string[];
+  image: ProfilePicture;
+  apps: string[];
 };

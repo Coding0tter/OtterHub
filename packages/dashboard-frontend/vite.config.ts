@@ -13,7 +13,7 @@ export default defineConfig({
   },
   build: {
     target: "esnext",
-    outDir: "../../output/dist/gateway",
+    outDir: "../../output/dist/dashboard",
     emptyOutDir: true,
   },
   resolve: {

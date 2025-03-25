@@ -3,17 +3,17 @@ import { TransactionModel } from "../models/transaction.db";
 import type { Transaction } from "../types/transaction";
 
 export const addTransaction = async (
-  email: string,
+  userId: string,
   transaction: Partial<Transaction>,
 ) => {
   return await TransactionModel.create({
     ...transaction,
-    email,
+    userId,
   });
 };
 
 export const getTransactions = async (
-  email: string,
+  userId: string,
   query: {
     startDate?: Date;
     endDate?: Date;
@@ -21,7 +21,7 @@ export const getTransactions = async (
     category?: string;
   },
 ) => {
-  const filter: any = { email };
+  const filter: any = { userId };
 
   if (query.startDate || query.endDate) {
     filter.date = {};
@@ -47,14 +47,14 @@ export const getTransactions = async (
 };
 
 export const getMonthlyTransactions = async (
-  email: string,
+  userId: string,
   year: number,
   month: number,
 ) => {
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0);
 
-  return await getTransactions(email, { startDate, endDate });
+  return await getTransactions(userId, { startDate, endDate });
 };
 
 export const updateTransaction = async (
@@ -73,13 +73,13 @@ export const deleteTransaction = async (id: string) => {
 };
 
 export const getCategoryBreakdown = async (
-  email: string,
+  userId: string,
   year: number,
   month?: number,
   type: "income" | "expense" | "all" = "all",
 ) => {
   const matchStage: any = {
-    email,
+    userId,
     date: {},
   };
   if (type !== "all") {

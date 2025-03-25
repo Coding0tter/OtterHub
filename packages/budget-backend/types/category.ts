@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 
 export interface Category extends Document<string> {
-  email: string;
+  userId: string;
   name: string;
   color?: string;
   isParent?: boolean;
@@ -11,6 +11,6 @@ export interface Category extends Document<string> {
 export interface SubCategory extends Document<string> {
   name: string;
   parentId: string;
-  email: string;
+  userId: string;
   color?: string;
 }

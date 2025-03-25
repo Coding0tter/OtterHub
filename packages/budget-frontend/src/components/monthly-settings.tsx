@@ -1,16 +1,16 @@
-import type { Category, FixedCost } from "budget-backend/types";
+import type { FixedCost } from "budget-backend/types";
 import {
   Button,
   Card,
+  formatMoney,
   Header,
   Input,
   Label,
   useConfirmDelete,
   useToast,
 } from "components";
-import { formatMoney } from "shared";
 import { createResource, createSignal, For, Show, Suspense } from "solid-js";
-import { budgetApiClient } from "../App";
+import { budgetApi } from "../App";
 import { CategorySelect } from "./category-select";
 
 export const MonthlySettings = () => {
@@ -20,23 +20,22 @@ export const MonthlySettings = () => {
   const [fixedCost, setFixedCost] = createSignal<any>();
 
   const [categories] = createResource(async () => {
-    return (await budgetApiClient.get("/categories/with-subcategories")).data;
+    return (await budgetApi.get("/categories/with-subcategories")).data;
   });
 
   const [fixedCosts, { refetch }] = createResource<FixedCost[]>(async () => {
-    return (await budgetApiClient.get("/fixed-costs")).data;
+    return (await budgetApi.get("/fixed-costs")).data;
   });
 
   const [categoryBreakdown, { refetch: refetchBreakdown }] = createResource(
     showTab,
     async (type: "income" | "expense") => {
-      return (await budgetApiClient.get(`/fixed-costs/categories/${type}`))
-        .data;
+      return (await budgetApi.get(`/fixed-costs/categories/${type}`)).data;
     },
   );
 
   const [savingsGoal] = createResource<number>(async () => {
-    return (await budgetApiClient.get("/savings-goal")).data || 0;
+    return (await budgetApi.get("/savings-goal")).data || 0;
   });
 
   const getSum = (type: "income" | "expense") => {
@@ -65,7 +64,7 @@ export const MonthlySettings = () => {
 
   const deleteFixedCost = async (id: string) => {
     try {
-      await budgetApiClient.delete(`/fixed-costs/${id}`);
+      await budgetApi.delete(`/fixed-costs/${id}`);
       addToast({
         message: "Fixed cost deleted",
         type: "success",
@@ -83,7 +82,7 @@ export const MonthlySettings = () => {
 
   const handleSave = async () => {
     try {
-      await budgetApiClient.post("/fixed-costs", {
+      await budgetApi.post("/fixed-costs", {
         fixedCost: { ...fixedCost(), type: showTab() },
       });
       addToast({

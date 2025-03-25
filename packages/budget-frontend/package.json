@@ -24,6 +24,7 @@
     "components": "workspace:*",
     "dayjs": "^1.11.13",
     "shared": "workspace:*",
+    "auth": "workspace:*",
     "solid-js": "^1.9.5",
     "tailwindcss": "^4.0.11"
   }

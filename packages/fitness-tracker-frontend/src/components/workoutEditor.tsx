@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from "@solidjs/router";
+import { Button, Card, Header, Input, useToast } from "components";
 import type { Exercise } from "fitness-tracker-backend/types/exercise";
 import type { Workout } from "fitness-tracker-backend/types/workout";
-import { Button, Card, Header, Input, useToast } from "components";
 import { createSignal, For, onMount } from "solid-js";
-import { fitnessApiClient } from "../App";
+import { fitnessApi } from "../App";
 
 export const WorkoutEditor = () => {
   const { addToast } = useToast();
@@ -15,8 +15,10 @@ export const WorkoutEditor = () => {
   });
 
   onMount(async () => {
-    const workout = await fitnessApiClient.get("/workout?id=" + params.id);
-    setWorkout(workout.data);
+    if (params.id !== "new") {
+      const workout = await fitnessApi.get("/workout?id=" + params.id);
+      setWorkout(workout.data);
+    }
   });
 
   const addExercise = () =>
@@ -43,7 +45,7 @@ export const WorkoutEditor = () => {
 
   const handleSave = async () => {
     try {
-      await fitnessApiClient.post("/workout", { workout: workout() });
+      await fitnessApi.post("/workout", { workout: workout() });
       addToast({ message: "Workout saved" });
       navigator("/fitness");
     } catch (err) {
@@ -56,7 +58,7 @@ export const WorkoutEditor = () => {
 
   const handleDelete = async () => {
     try {
-      await fitnessApiClient.delete("/workout?id=" + params.id);
+      await fitnessApi.delete("/workout?id=" + params.id);
       addToast({ message: "Workout deleted" });
       navigator("/fitness");
     } catch (err) {

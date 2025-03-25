@@ -2,12 +2,12 @@ import { CategoryModel, SubCategoryModel } from "../models/category.db";
 import type { Category, SubCategory } from "../types/category";
 
 export const upsertCategory = async (
-  email: string,
+  userId: string,
   category: Partial<Category>,
 ) => {
   const existingCategory = await CategoryModel.findOne({
     name: category.name,
-    email,
+    userId,
     deleted: false,
   })
     .lean()
@@ -19,26 +19,26 @@ export const upsertCategory = async (
 
   if (category._id) {
     return await CategoryModel.findOneAndUpdate(
-      { _id: category._id, email },
-      { ...category, email },
+      { _id: category._id, userId },
+      { ...category, userId },
       { new: true },
     )
       .lean()
       .exec();
   } else {
-    const newCategory = new CategoryModel({ ...category, email });
+    const newCategory = new CategoryModel({ ...category, userId });
     await newCategory.save();
     return newCategory.toObject();
   }
 };
 
 export const upsertSubCategory = async (
-  email: string,
+  userId: string,
   subCategory: Partial<SubCategory>,
 ) => {
   const parentCategory = await CategoryModel.findOne({
     _id: subCategory.parentId,
-    email,
+    userId,
     deleted: false,
   }).lean();
 
@@ -55,7 +55,7 @@ export const upsertSubCategory = async (
   const existingSubCategory = await SubCategoryModel.findOne({
     name: subCategory.name,
     parentId: subCategory.parentId,
-    email,
+    userId,
     deleted: false,
   })
     .lean()
@@ -67,15 +67,15 @@ export const upsertSubCategory = async (
 
   if (subCategory._id && subCategory._id !== "new") {
     return await SubCategoryModel.findOneAndUpdate(
-      { _id: subCategory._id, email },
-      { ...subCategory, email },
+      { _id: subCategory._id, userId },
+      { ...subCategory, userId },
       { new: true },
     )
       .lean()
       .exec();
   } else {
     delete subCategory._id;
-    const newSubCategory = new SubCategoryModel({ ...subCategory, email });
+    const newSubCategory = new SubCategoryModel({ ...subCategory, userId });
     await newSubCategory.save();
     return newSubCategory.toObject();
   }
@@ -101,25 +101,25 @@ export const deleteSubCategory = async (id: string) => {
   await SubCategoryModel.findByIdAndUpdate(id, { deleted: true }).exec();
 };
 
-export const getCategories = async (email: string) => {
-  const query: any = { email };
+export const getCategories = async (userId: string) => {
+  const query: any = { userId };
   query.deleted = false;
 
   return await CategoryModel.find(query).sort({ name: 1 }).lean().exec();
 };
 
-export const getSubCategories = async (email: string, parentId: string) => {
-  const query = { email, deleted: false, parentId };
+export const getSubCategories = async (userId: string, parentId: string) => {
+  const query = { userId, deleted: false, parentId };
   return await SubCategoryModel.find(query).sort({ name: 1 }).lean().exec();
 };
 
-export const getCategoriesWithSubcategories = async (email: string) => {
-  const categories = await getCategories(email);
+export const getCategoriesWithSubcategories = async (userId: string) => {
+  const categories = await getCategories(userId);
 
   const result = await Promise.all(
     categories.map(async (category) => {
       const subCategories = await getSubCategories(
-        email,
+        userId,
         category._id.toString(),
       );
       return {

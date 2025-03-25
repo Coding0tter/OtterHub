@@ -12,6 +12,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.2.0",
     "elysia": "^1.2.24",
     "mongoose": "^8.12.1",
     "shared": "workspace:*"

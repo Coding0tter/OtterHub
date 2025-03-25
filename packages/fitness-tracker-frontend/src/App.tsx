@@ -1,32 +1,33 @@
 import axios from "axios";
 import { Dock, Navbar, ToastProvider } from "components";
-import { getApiClient } from "shared";
+import { authClient } from "auth";
 import { createResource, type Component } from "solid-js";
 
-export const fitnessApiClient = getApiClient("/fitness");
-export const authApiClient = getApiClient("/auth");
+export const authApi = axios.create({
+  baseURL: import.meta.env.OTTER_AUTH_API_URL,
+  withCredentials: true,
+});
+
+export const fitnessApi = axios.create({
+  baseURL: import.meta.env.OTTER_FITNESS_API_URL,
+  withCredentials: true,
+});
 
 const App: Component = (props: any) => {
-  const [profilePicture] = createResource(async () => {
-    try {
-      const result = await authApiClient.get("/user");
-
-      const imageResponse = await authApiClient.get(
-        `/profile-picture?url=${result.data.picture}`,
-        { responseType: "blob" },
+  const session = authClient.useSession();
+  const [profilePicture] = createResource(
+    () => session().data?.user?.image,
+    async (userImage) => {
+      if (!userImage) return;
+      const imageResponse = await authApi.get(
+        `/profile-picture?url=${userImage}`,
+        {
+          responseType: "blob",
+        },
       );
-      const imageUrl = URL.createObjectURL(imageResponse.data);
-      return imageUrl;
-    } catch (err: any) {
-      if (
-        axios.isAxiosError(err) &&
-        (err.response?.status === 401 || err.response?.status === 403)
-      ) {
-        window.location.href = `${import.meta.env.OTTER_FRONTEND_URL}`;
-      }
-      return "";
-    }
-  });
+      return URL.createObjectURL(imageResponse.data);
+    },
+  );
 
   return (
     <>

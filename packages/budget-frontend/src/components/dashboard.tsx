@@ -1,17 +1,10 @@
 import type { Account, FixedCost, Transaction } from "budget-backend/types";
 import { Button, Card, Header, Input, Label, useToast } from "components";
 import dayjs from "dayjs";
-import { formatMoney } from "shared";
-import {
-  createResource,
-  createSignal,
-  For,
-  onMount,
-  Show,
-  Suspense,
-} from "solid-js";
-import { budgetApiClient } from "../App";
+import { formatMoney } from "components";
+import { createResource, createSignal, For, Show, Suspense } from "solid-js";
 import { CategorySelect } from "./category-select";
+import { budgetApi } from "../App";
 
 export const Dashboard = () => {
   const { addToast } = useToast();
@@ -22,28 +15,27 @@ export const Dashboard = () => {
     "all",
   );
   const [savingsGoal] = createResource<number>(async () => {
-    return (await budgetApiClient.get("/savings-goal")).data || 0;
+    return (await budgetApi.get("/savings-goal")).data || 0;
   });
   const [categories] = createResource(async () => {
-    return (await budgetApiClient.get("/categories/with-subcategories")).data;
+    return (await budgetApi.get("/categories/with-subcategories")).data;
   });
   const [fixedCosts] = createResource<FixedCost[]>(async () => {
-    return (await budgetApiClient.get("/fixed-costs")).data;
+    return (await budgetApi.get("/fixed-costs")).data;
   });
   const [transactions, { refetch: fetchTransactions }] = createResource(
     selectedMonth,
     async (month) => {
       const start = month.startOf("month").toISOString();
       const end = month.endOf("month").toISOString();
-      return (
-        await budgetApiClient.get(`/transaction?start=${start}&end=${end}`)
-      ).data;
+      return (await budgetApi.get(`/transaction?start=${start}&end=${end}`))
+        .data;
     },
   );
 
   const [accounts, { mutate, refetch }] = createResource<Account[]>(
     async () => {
-      return (await budgetApiClient.get("/account")).data;
+      return (await budgetApi.get("/account")).data;
     },
   );
 
@@ -78,7 +70,7 @@ export const Dashboard = () => {
 
   const handleSave = async () => {
     try {
-      await budgetApiClient.post("/transaction", {
+      await budgetApi.post("/transaction", {
         transaction: { ...transaction(), type: showModal() },
       });
       addToast({

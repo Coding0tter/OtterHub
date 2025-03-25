@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getApiClient = (baseUrl: string) => {
   const apiClient = axios.create({
-    baseURL: import.meta.env.OTTER_API_URL + baseUrl,
+    baseURL: baseUrl,
     withCredentials: true,
   });
 

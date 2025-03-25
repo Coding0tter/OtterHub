@@ -4,7 +4,9 @@ import { createResource, createSignal } from "solid-js";
 import DatePicker, { type PickerValue } from "@rnwonder/solid-date-picker";
 import "@rnwonder/solid-date-picker/dist/style.css";
 import dayjs from "dayjs";
-import { authApiClient, fitnessApiClient } from "../App";
+import axios from "axios";
+import { authApi, fitnessApi } from "../App";
+import { authClient } from "auth";
 
 export const Profile = () => {
   const { addToast } = useToast();
@@ -17,23 +19,25 @@ export const Profile = () => {
     },
     label: "",
   });
+  const session = authClient.useSession();
 
   const [user] = createResource(
+    () => session()?.data?.user,
     async (): Promise<FitnessUser & { image: string }> => {
-      const result = await fitnessApiClient.get("/user");
+      const result = await fitnessApi.get("/user");
       const userData = result.data;
 
       setWeight(userData.weight);
       setHeight(userData.height);
-      setName(userData.name);
+      setName(session().data!.user.name);
       if (userData.dateOfBirth)
         setDateOfBirth({
           value: { selected: userData.dateOfBirth.toString() },
           label: dayjs(userData.dateOfBirth).format("DD.MM.YYYY"),
         } as PickerValue);
 
-      const imageResponse = await authApiClient.get(
-        `/profile-picture?url=${result.data.picture}`,
+      const imageResponse = await authApi.get(
+        `/profile-picture?url=${session().data!.user.image}`,
         { responseType: "blob" },
       );
       const imageUrl = URL.createObjectURL(imageResponse.data);
@@ -43,8 +47,9 @@ export const Profile = () => {
 
   const handleSave = async () => {
     try {
-      await fitnessApiClient.put("/user", {
+      await fitnessApi.put("/user", {
         user: {
+          id: session().data!.user.id,
           email: user()?.email,
           weight: weight(),
           height: height(),

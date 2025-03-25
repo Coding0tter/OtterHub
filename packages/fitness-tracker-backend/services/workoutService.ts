@@ -5,28 +5,29 @@ import type { FitnessUser } from "../types/user";
 import type { ActualWorkout, Workout } from "../types/workout";
 
 export const upsertUser = async (user: FitnessUser) => {
-  const existingUser = await UserModel.findOne({ email: user.email });
+  const existingUser = await UserModel.findOne({ userId: user.id });
 
   if (!existingUser) {
+    user.userId = user.id!;
     return await UserModel.create(user);
   }
 
-  return await UserModel.findOneAndUpdate({ email: user.email }, user, {
+  return await UserModel.findOneAndUpdate({ userId: user.id }, user, {
     new: true,
   }).lean();
 };
 
-export const getUser = async (email: string) => {
-  return await UserModel.findOne({ email })
+export const getUser = async (userId: string) => {
+  return await UserModel.findOne({ userId })
     .populate("plannedWorkouts")
     .populate("actualWorkouts")
     .lean()
     .exec();
 };
 
-export const upsertWorkout = async (email: string, workout: Workout) => {
+export const upsertWorkout = async (userId: string, workout: Workout) => {
   try {
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await UserModel.findOne({ userId });
     if (!existingUser) {
       return null;
     }
@@ -84,11 +85,11 @@ export const deleteWorkout = async (id: string) => {
 };
 
 export const saveActualWorkout = async (
-  email: string,
+  userId: string,
   exercises: ActualWorkout[],
 ) => {
   try {
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await UserModel.findOne({ userId });
     if (!existingUser) {
       return;
     }
@@ -112,8 +113,8 @@ export const saveActualWorkout = async (
   }
 };
 
-export const getGroupedWorkouts = async (email: string) => {
-  const existingUser = await UserModel.findOne({ email })
+export const getGroupedWorkouts = async (userId: string) => {
+  const existingUser = await UserModel.findOne({ userId })
     .populate("actualWorkouts")
     .lean();
 
@@ -135,8 +136,8 @@ export const getGroupedWorkouts = async (email: string) => {
   return groupedWorkouts;
 };
 
-export const getProgress = async (email: string) => {
-  const user = await UserModel.findOne({ email });
+export const getProgress = async (userId: string) => {
+  const user = await UserModel.findOne({ userId });
   if (!user) return;
 
   const workoutIds = user.actualWorkouts;

@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 
 export const Account = new Schema({
-  email: { type: String, required: true },
+  userId: { type: String, required: true },
   name: { type: String },
   amount: { type: Number },
 });

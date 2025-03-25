@@ -2,17 +2,17 @@ import moment from "moment";
 import { Card, Header } from "components";
 import { createResource, For, Show, Suspense } from "solid-js";
 import { OverallProgressChart } from "./overall-progress-chart";
-import { fitnessApiClient } from "../App";
+import { fitnessApi } from "../App";
 
 export const WorkoutProgress = () => {
   const [progress] = createResource(async () => {
-    const progress = await fitnessApiClient.get("/progress");
+    const progress = await fitnessApi.get("/progress");
     return progress.data;
   });
 
   const [pastWorkouts] = createResource(async () => {
     try {
-      const workouts = await fitnessApiClient.get("/past-workouts");
+      const workouts = await fitnessApi.get("/past-workouts");
       return Object.keys(workouts.data).map((date: any) => ({
         date,
         exercises: workouts.data[date],

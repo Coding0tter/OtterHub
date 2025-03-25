@@ -8,3 +8,5 @@ export * from "./card.tsx";
 export * from "./navbar.tsx";
 export * from "./confirm-delete.tsx";
 export * from "./colorpicker.tsx";
+
+export * from "./lib";

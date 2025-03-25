@@ -89,13 +89,7 @@ const createProxyHandler = (targetBase: string, prefix: string) => {
   };
 };
 
-const app = new Elysia()
-  .use(cors() as any)
-  .all("/auth/*", createProxyHandler(Bun.env.AUTH_URL as string, "/auth"))
-  .get(
-    "/auth/user",
-    withAuth(createProxyHandler(Bun.env.AUTH_URL as string, "/auth")),
-  );
+const app = new Elysia().use(cors());
 
 Object.keys(services).forEach((service) => {
   console.log(`Registering ${service}`);

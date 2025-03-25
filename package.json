@@ -3,14 +3,14 @@
   "private": true,
   "scripts": {
     "gateway": "bun run --watch packages/gateway-backend/gateway.ts",
-    "gateway-frontend": "cd packages/gateway-frontend && bun run dev",
-    "auth": "bun run --watch packages/auth/auth.ts",
+    "dashboard-frontend": "cd packages/dashboard-frontend && bun run dev",
+    "auth": "bun run --watch packages/auth/server.ts",
     "fitness-tracker": "bun run --watch packages/fitness-tracker-backend/server.ts",
     "fitness-tracker-frontend": "cd packages/fitness-tracker-frontend && bun run dev",
-    "frontend-proxy": "cd packages/frontend-proxy && bun start",
+    "frontend-proxy": "cd packages/frontend-proxy && bun --env-file=../../.env.development start",
     "budget": "bun run --watch packages/budget-backend/server.ts",
     "budget-frontend": "cd packages/budget-frontend && bun run dev",
-    "start": "bunx concurrently -n 'GW, GW-FE, AUTH, FT, FT-FE, BG, BG-FE, PROXY' -c 'blue.bold,cyan.bold,magenta.bold,green.bold,yellow.bold' \"bun run gateway\" \"bun run gateway-frontend\" \"bun run auth\" \"bun run fitness-tracker\" \"bun run fitness-tracker-frontend\" \"bun run budget\" \"bun run budget-frontend\" \"bun run frontend-proxy\"",
+    "start": "export NODE_ENV=development && bunx concurrently -n 'GW, DASH-FE, AUTH, FT, FT-FE, BG, BG-FE, PROXY' -c 'blue.bold,cyan.bold,magenta.bold,green.bold,yellow.bold' \"bun run gateway\" \"bun run dashboard-frontend\" \"bun run auth\" \"bun run fitness-tracker\" \"bun run fitness-tracker-frontend\" \"bun run budget\" \"bun run budget-frontend\" \"bun run frontend-proxy\"",
     "build": "cd scripts && ./build.sh"
   },
   "workspaces": [

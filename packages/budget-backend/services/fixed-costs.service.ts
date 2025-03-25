@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 import { FixedCostsModel } from "../models/fixed-costs.db";
 import type { FixedCost } from "../types/fixed-cost";
 
-export const getFixedCosts = async (email: string) =>
-  await FixedCostsModel.find({ email })
+export const getFixedCosts = async (userId: string) =>
+  await FixedCostsModel.find({ userId })
     .populate("category")
     .populate("subCategory")
     .exec();
 
 export const upsertFixedCost = async (
-  email: string,
+  userId: string,
   fixedCost: Partial<FixedCost>,
 ) =>
   await FixedCostsModel.findOneAndUpdate(
@@ -18,7 +18,7 @@ export const upsertFixedCost = async (
     },
     {
       ...fixedCost,
-      email: email,
+      userId,
     },
     {
       new: true,
@@ -32,11 +32,11 @@ export const deleteFixedCost = async (id: string) =>
   await FixedCostsModel.findByIdAndDelete(id).exec();
 
 export const getFixedCategoryBreakdown = async (
-  email: string,
+  userId: string,
   type: "income" | "expense",
 ) => {
   return await FixedCostsModel.aggregate([
-    { $match: { email, type } },
+    { $match: { userId, type } },
     {
       $lookup: {
         from: "categories",

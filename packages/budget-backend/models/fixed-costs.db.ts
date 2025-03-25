@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 
 export const FixedCosts = new Schema({
-  email: { type: String, required: true },
+  userId: { type: String, required: true },
   category: { type: Schema.Types.ObjectId, ref: "Category" },
   subCategory: { type: Schema.Types.ObjectId, ref: "SubCategory" },
   name: { type: String },

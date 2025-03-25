@@ -9,9 +9,9 @@ import {
   useToast,
 } from "components";
 import type { FixedCost } from "packages/budget-backend/types/fixed-cost";
-import { formatMoney } from "shared";
+import { formatMoney } from "components";
 import { For, Show, Suspense, createResource, createSignal } from "solid-js";
-import { budgetApiClient } from "../App";
+import { budgetApi } from "../App";
 import { CategorySettings } from "./category-settings";
 
 export const AccountSettings = () => {
@@ -22,18 +22,18 @@ export const AccountSettings = () => {
   const [account, setAccount] = createSignal<Partial<Account>>();
 
   const [fixedCosts] = createResource<FixedCost[]>(async () => {
-    return (await budgetApiClient.get("/fixed-costs")).data;
+    return (await budgetApi.get("/fixed-costs")).data;
   });
 
   const [savingsGoal, { mutate: mutateSavingsGoal }] = createResource(
     async () => {
-      return (await budgetApiClient.get("/savings-goal")).data || 0;
+      return (await budgetApi.get("/savings-goal")).data || 0;
     },
   );
 
   const [accounts, { mutate, refetch }] = createResource<Account[]>(
     async () => {
-      return (await budgetApiClient.get("/account")).data;
+      return (await budgetApi.get("/account")).data;
     },
   );
 
@@ -47,7 +47,7 @@ export const AccountSettings = () => {
 
   const handleSaveAccount = async () => {
     try {
-      await budgetApiClient.post("/account", {
+      await budgetApi.post("/account", {
         account: account(),
       });
 
@@ -70,7 +70,7 @@ export const AccountSettings = () => {
 
   const deleteAccount = async (accountId: string) => {
     try {
-      await budgetApiClient.delete("/account?accountId=" + accountId);
+      await budgetApi.delete("/account?accountId=" + accountId);
       addToast({ message: "Account deleted", type: "success" });
       mutate((prev) => prev?.filter((account) => account._id !== accountId));
     } catch (err) {
@@ -81,7 +81,7 @@ export const AccountSettings = () => {
 
   const handleSaveSavingsGoal = async () => {
     try {
-      await budgetApiClient.post("/savings-goal", {
+      await budgetApi.post("/savings-goal", {
         savingsGoal: savingsGoal(),
       });
       addToast({ message: "Savings goal saved", type: "success" });

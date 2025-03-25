@@ -10,7 +10,7 @@ import {
   useToast,
 } from "components";
 import { createResource, createSignal, For, Show } from "solid-js";
-import { budgetApiClient } from "../App";
+import { budgetApi } from "../App";
 
 export const CategorySettings = () => {
   const { confirmDelete } = useConfirmDelete();
@@ -24,7 +24,7 @@ export const CategorySettings = () => {
   let categoryFormRef: HTMLFormElement | null = null;
   const [categories, { mutate: mutateCategories, refetch: refetchCategories }] =
     createResource<Partial<Category>[]>(async () => {
-      return (await budgetApiClient.get("/categories/with-subcategories")).data;
+      return (await budgetApi.get("/categories/with-subcategories")).data;
     });
 
   const [openCategories, setOpenCategories] = createSignal<number[]>([]);
@@ -36,7 +36,7 @@ export const CategorySettings = () => {
 
   const handleSaveCategory = async () => {
     try {
-      await budgetApiClient.post("/categories", {
+      await budgetApi.post("/categories", {
         category: category(),
       });
 
@@ -57,7 +57,7 @@ export const CategorySettings = () => {
   const handleSaveSubCategory = async () => {
     try {
       const { id, ...subCategoryData } = subCategory();
-      await budgetApiClient.post("/subCategories", {
+      await budgetApi.post("/subCategories", {
         subCategory: subCategoryData,
       });
 
@@ -105,7 +105,7 @@ export const CategorySettings = () => {
 
   const deleteCategory = async (categoryId: string) => {
     try {
-      await budgetApiClient.delete(`/categories/${categoryId}`);
+      await budgetApi.delete(`/categories/${categoryId}`);
       addToast({ message: "Category deleted", type: "success" });
       mutateCategories((prev) => prev?.filter((cat) => cat._id !== categoryId));
     } catch (err) {
@@ -125,7 +125,7 @@ export const CategorySettings = () => {
 
   const deleteSubCategory = async (subCategoryId: string) => {
     try {
-      await budgetApiClient.delete(`/subCategories/${subCategoryId}`);
+      await budgetApi.delete(`/subCategories/${subCategoryId}`);
       addToast({ message: "Subcategory deleted", type: "success" });
       mutateCategories((prev) => {
         if (!prev) return prev;

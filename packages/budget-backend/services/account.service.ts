@@ -3,7 +3,7 @@ import { AccountModel } from "../models/account.db";
 import type { Account } from "../types/account";
 
 export const upsertAccount = async (
-  email: string,
+  userId: string,
   account: Partial<Account>,
 ) => {
   const existingAccount = await AccountModel.findOneAndUpdate(
@@ -12,7 +12,7 @@ export const upsertAccount = async (
     },
     {
       ...account,
-      email: email,
+      userId,
     },
     {
       new: true,
@@ -25,8 +25,8 @@ export const upsertAccount = async (
   return existingAccount;
 };
 
-export const getAccounts = async (email: string) =>
-  await AccountModel.find({ email }).exec();
+export const getAccounts = async (userId: string) =>
+  await AccountModel.find({ userId }).exec();
 
 export const deleteAccount = async (accountId: string) => {
   console.log(accountId);

@@ -1,4 +1,4 @@
-import { createResource, type Component } from "solid-js";
+import { createResource, onMount, type Component } from "solid-js";
 
 import axios from "axios";
 import {
@@ -7,32 +7,39 @@ import {
   Navbar,
   ToastProvider,
 } from "components";
-import { getApiClient } from "shared";
+import { authClient } from "auth";
 
-export const authApiClient = getApiClient("/auth");
-export const budgetApiClient = getApiClient("/budget");
+export const authApi = axios.create({
+  baseURL: import.meta.env.OTTER_AUTH_API_URL,
+  withCredentials: true,
+});
+
+export const budgetApi = axios.create({
+  baseURL: import.meta.env.OTTER_BUDGET_API_URL,
+  withCredentials: true,
+});
 
 const App: Component = (props: any) => {
-  const [profilePicture] = createResource(async () => {
-    try {
-      const result = await budgetApiClient.get("/user");
+  const session = authClient.useSession();
 
-      const imageResponse = await authApiClient.get(
-        `/profile-picture?url=${result.data.picture}`,
-        { responseType: "blob" },
-      );
-      const imageUrl = URL.createObjectURL(imageResponse.data);
-      return imageUrl;
-    } catch (err: any) {
-      if (
-        axios.isAxiosError(err) &&
-        (err.response?.status === 401 || err.response?.status === 403)
-      ) {
-        window.location.href = `${import.meta.env.OTTER_FRONTEND_URL}`;
-      }
-      return "";
-    }
+  onMount(async () => {
+    await budgetApi.get("/user");
   });
+
+  const [profilePicture] = createResource(
+    () => session().data?.user?.image,
+    async (userImage) => {
+      if (!userImage) return;
+      const imageResponse = await authApi.get(
+        `/profile-picture?url=${userImage}`,
+        {
+          responseType: "blob",
+        },
+      );
+      return URL.createObjectURL(imageResponse.data);
+    },
+  );
+
   return (
     <>
       <Navbar title="BudgetApp" profilePicture={profilePicture} />

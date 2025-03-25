@@ -1,9 +1,9 @@
 import { Card, Header, Label } from "components";
 import dayjs from "dayjs";
-import { formatMoney } from "shared";
+import { formatMoney } from "components";
 import { createResource, createSignal, For, Show } from "solid-js";
-import { budgetApiClient } from "../App";
 import { DonutChart } from "./donut-chart";
+import { budgetApi } from "../App";
 
 export const Stats = () => {
   const [filterFixed, setFilterFixed] = createSignal(false);
@@ -21,10 +21,8 @@ export const Stats = () => {
       url += `&month=${selectedMonth().month()}`;
     }
 
-    const transactionResponse = await budgetApiClient.get(
-      "/transaction/" + url,
-    );
-    const fixedResponse = await budgetApiClient.get(
+    const transactionResponse = await budgetApi.get("/transaction/" + url);
+    const fixedResponse = await budgetApi.get(
       "/fixed-costs/categories/" + activeTab(),
     );
 

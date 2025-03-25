@@ -70,18 +70,18 @@ services:
     env_file:
       - .env
 
-  gateway-frontend:
+  dashboard-frontend:
     build:
       context: .
-      dockerfile: packages/gateway-frontend/Dockerfile
+      dockerfile: packages/dashboard-frontend/Dockerfile
     ports:
-      - "${GATEWAY_FRONTEND_PORT}:${GATEWAY_FRONTEND_PORT}"
+      - "${DASHBOARD_FRONTEND_PORT}:${DASHBOARD_FRONTEND_PORT}"
     env_file:
       - .env
 
   mongo:
     image: mongo:latest
-    container_name: mongo
+    container_name: theultimateapp-mongo
     restart: always
     ports:
       - "27017:27017"
