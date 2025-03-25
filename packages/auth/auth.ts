@@ -125,8 +125,10 @@ new Elysia()
       const { idToken } = body as { idToken: string };
       const ticket = await client.verifyIdToken({
         idToken,
-        audience: process.env.OTTER_GOOGLE_CLIENT_ID,
+        audience: Bun.env.OTTER_GOOGLE_CLIENT_ID,
       });
+
+      console.log(idToken)
 
       const payload = ticket.getPayload();
       if (!payload) throw new Error("Invalid token");
@@ -152,6 +154,7 @@ new Elysia()
       };
 
       const { refreshToken, accessCookie } = getTokenPair(jwtPayload);
+      console.log(refreshToken, accessCookie)
 
       return new Response(
         JSON.stringify({ message: "Logged in successfully", refreshToken }),

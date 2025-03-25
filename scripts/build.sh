@@ -1,4 +1,4 @@
 #!/bin/sh
 
-docker build -f ../Dockerfile.base -t theultimateapp-base ../
-docker compose up --build
+sudo docker build -f ../Dockerfile.base -t theultimateapp-base ../
+sudo docker compose --parallel 1 up --build -d

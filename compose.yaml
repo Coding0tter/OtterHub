@@ -80,7 +80,7 @@ services:
       - .env
 
   mongo:
-    image: mongo:latest
+    image: mongo:bionic
     container_name: mongo
     restart: always
     ports:
